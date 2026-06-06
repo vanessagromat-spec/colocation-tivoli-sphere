@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Tivoli Sphere</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --foret:#085041;--emeraude:#1D9E75;--bleu:#185FA5;--bleu-fonce:#0C447C;
+  --vert-lime:#97C459;--or:#EF9F27;--bois:#854F0B;--fond:#F0F9F4;--fond2:#E8F7F2;
+  --texte:#1A2E25;--texte-muted:#6B8070;--border:rgba(29,158,117,0.15);
+  --rouge:#D63031;--radius:14px;--shadow:0 4px 24px rgba(8,80,65,0.1);--shadow2:0 2px 12px rgba(8,80,65,0.07);
+  --admin:#0C447C;--admin2:#185FA5;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--fond);color:var(--texte);min-height:100vh;overflow-x:hidden;}
+
+/* ── LOGIN ── */
+#login-screen {
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#071f18 0%,#0a3d2e 50%,#0C447C 100%);
+  display:flex;align-items:center;justify-content:center;
+}
+.login-box {
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);
+  border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:380px;
+  backdrop-filter:blur(20px);box-shadow:0 30px 80px rgba(0,0,0,0.4);
+}
+.login-logo { text-align:center;margin-bottom:2rem; }
+.login-logo .mark {
+  width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg,var(--emeraude),var(--bleu));
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:0.85rem;box-shadow:0 8px 24px rgba(29,158,117,0.4);
+}
+.login-logo h1 { font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:white;font-style:italic; }
+.login-logo p { font-size:0.7rem;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;margin-top:3px; }
+.login-field { margin-bottom:1rem; }
+.login-field label { display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.45);margin-bottom:0.4rem; }
+.login-field input {
+  width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);
+  border-radius:10px;color:white;font-family:'DM Sans',sans-serif;font-size:0.9rem;
+  padding:0.7rem 1rem;outline:none;transition:border-color 0.2s;letter-spacing:1px;
+}
+.login-field input:focus { border-color:var(--emeraude); }
+.login-field input::placeholder { color:rgba(255,255,255,0.2);letter-spacing:0; }
+.login-btn {
+  width:100%;padding:0.8rem;background:linear-gradient(135deg,var(--emeraude),var(--bleu));
+  border:none;border-radius:10px;color:white;font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.2s;margin-top:0.5rem;
+  letter-spacing:0.3px;
+}
+.login-btn:hover { opacity:0.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(29,158,117,0.4); }
+.login-error { color:#ff6b6b;font-size:0.75rem;text-align:center;margin-top:0.65rem;display:none; }
+.login-hint { font-size:0.68rem;color:rgba(255,255,255,0.2);text-align:center;margin-top:1rem; }
+.attempts-bar { display:flex;justify-content:center;gap:6px;margin-top:0.85rem; }
+.attempt-dot { width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:background 0.3s; }
+.attempt-dot.used { background:var(--rouge); }
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:linear-gradient(160deg,#071f18 0%,#0C447C 100%);display:flex;flex-direction:column;z-index:100;box-shadow:4px 0 24px rgba(0,0,0,0.2);}
+.logo-zone{padding:1.25rem 1.25rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.08);}
+.logo-text{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;background:linear-gradient(90deg,#C0DD97,#7EB8F5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.logo-sub{font-size:0.58rem;color:rgba(255,255,255,0.28);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.admin-badge{margin:0.6rem 1.25rem;padding:0.3rem 0.75rem;border-radius:20px;font-size:0.65rem;background:rgba(214,48,49,0.2);color:#ff8080;border:1px solid rgba(214,48,49,0.3);display:flex;align-items:center;gap:6px;}
+nav{flex:1;padding:0.25rem 0;overflow-y:auto;}
+.nav-section{padding:0.5rem 1.25rem 0.2rem;font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.22);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:0.55rem 1.25rem;color:rgba(255,255,255,0.6);font-size:0.8rem;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;}
+.nav-item:hover{color:white;background:rgba(255,255,255,0.05);}
+.nav-item.active{color:#7EB8F5;border-left-color:#7EB8F5;background:rgba(24,95,165,0.15);}
+.nav-item .icon{font-size:0.95rem;width:20px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--rouge);color:white;font-size:0.58rem;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+.sidebar-bottom{padding:0.85rem 1.25rem;border-top:1px solid rgba(255,255,255,0.08);}
+.admin-user{display:flex;align-items:center;gap:10px;}
+.admin-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--rouge),var(--admin2));display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:500;color:white;flex-shrink:0;}
+.logout-btn{margin-top:0.65rem;width:100%;padding:0.4rem;background:rgba(214,48,49,0.15);border:1px solid rgba(214,48,49,0.25);border-radius:8px;color:#ff8080;font-size:0.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.logout-btn:hover{background:rgba(214,48,49,0.25);}
+
+/* ── MAIN ── */
+.main{margin-left:240px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{background:white;border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:50;box-shadow:var(--shadow2);}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--admin);flex:1;}
+.admin-tag{background:rgba(214,48,49,0.1);color:var(--rouge);font-size:0.65rem;padding:3px 10px;border-radius:20px;font-weight:500;border:1px solid rgba(214,48,49,0.2);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0.42rem 1rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;}
+.btn-primary{background:var(--emeraude);color:white;}.btn-primary:hover{background:var(--foret);}
+.btn-secondary{background:var(--fond2);color:var(--foret);border:1px solid var(--border);}.btn-secondary:hover{background:var(--border);}
+.btn-danger{background:rgba(214,48,49,0.1);color:var(--rouge);border:1px solid rgba(214,48,49,0.2);}
+.btn-admin{background:var(--admin2);color:white;}.btn-admin:hover{background:var(--admin);}
+.btn-sm{padding:0.28rem 0.65rem;font-size:0.72rem;}
+.btn-gold{background:var(--or);color:white;}
+.content{padding:1.25rem;flex:1;}
+.page{display:none;}.page.active{display:block;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── CARDS & KPI ── */
+.card{background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow2);padding:1.1rem;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:0.95rem;font-weight:600;color:var(--foret);margin-bottom:0.85rem;display:flex;align-items:center;gap:8px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.85rem;margin-bottom:1.25rem;}
+.kpi-card{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:1rem 1.1rem;position:relative;overflow:hidden;box-shadow:var(--shadow2);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-card:nth-child(1)::before{background:linear-gradient(90deg,var(--emeraude),var(--vert-lime));}
+.kpi-card:nth-child(2)::before{background:linear-gradient(90deg,var(--bleu),#7EB8F5);}
+.kpi-card:nth-child(3)::before{background:linear-gradient(90deg,var(--or),#FAEEDA);}
+.kpi-card:nth-child(4)::before{background:linear-gradient(90deg,var(--rouge),#FF9999);}
+.kpi-label{font-size:0.67rem;color:var(--texte-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.4rem;}
+.kpi-value{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:600;color:var(--texte);line-height:1;}
+.kpi-sub{font-size:0.68rem;color:var(--texte-muted);margin-top:0.2rem;}
+.kpi-icon{position:absolute;right:0.9rem;top:50%;transform:translateY(-50%);font-size:1.6rem;opacity:0.1;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--foret);}
+
+/* ── BADGE ── */
+.badge{padding:3px 9px;border-radius:20px;font-size:0.65rem;font-weight:500;letter-spacing:0.3px;white-space:nowrap;}
+.badge-green{background:rgba(29,158,117,0.12);color:var(--emeraude);}
+.badge-blue{background:rgba(24,95,165,0.12);color:var(--bleu);}
+.badge-orange{background:rgba(239,159,39,0.15);color:#B87A00;}
+.badge-red{background:rgba(214,48,49,0.1);color:var(--rouge);}
+.badge-gray{background:rgba(0,0,0,0.06);color:var(--texte-muted);}
+.badge-admin{background:rgba(12,68,124,0.12);color:var(--admin);}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-size:0.67rem;text-transform:uppercase;letter-spacing:1px;color:var(--texte-muted);padding:0.55rem 0.7rem;text-align:left;border-bottom:2px solid var(--border);}
+.data-table td{padding:0.7rem;border-bottom:1px solid var(--border);font-size:0.8rem;vertical-align:middle;}
+.data-table tr:hover td{background:var(--fond);}
+
+/* ── MEMBRE STATUS ── */
+.membre-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:500;color:white;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+.dot-green{background:var(--emeraude);}
+.dot-red{background:var(--rouge);}
+.dot-orange{background:var(--or);}
+
+/* ── LITIGE CARD ── */
+.litige-card{background:white;border-radius:10px;border:1px solid var(--border);padding:1rem;margin-bottom:0.65rem;cursor:pointer;transition:all 0.2s;}
+.litige-card:hover{border-color:var(--admin2);box-shadow:var(--shadow2);}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(8,80,65,0.4);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:var(--radius);padding:1.35rem;width:90%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:fadeIn 0.25s ease;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--foret);}
+.modal-close{cursor:pointer;font-size:1.1rem;color:var(--texte-muted);background:none;border:none;padding:4px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:0.55rem;margin-top:1.1rem;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+.form-full{grid-column:1/-1;}
+.field label{display:block;font-size:0.67rem;text-transform:uppercase;letter-spacing:1px;color:var(--texte-muted);margin-bottom:0.3rem;}
+.field input,.field select,.field textarea{width:100%;background:var(--fond);border:1px solid var(--border);border-radius:8px;color:var(--texte);font-family:'DM Sans',sans-serif;font-size:0.83rem;padding:0.55rem 0.8rem;outline:none;transition:border-color 0.2s;}
+.field input:focus,.field select:focus{border-color:var(--emeraude);}
+.field textarea{height:75px;resize:vertical;}
+
+/* ── CHAT ── */
+.chat-mini{height:260px;overflow-y:auto;padding:0.75rem;display:flex;flex-direction:column;gap:0.55rem;background:var(--fond);border-radius:10px;border:1px solid var(--border);}
+.msg{display:flex;gap:0.55rem;max-width:85%;}
+.msg.mine{margin-left:auto;flex-direction:row-reverse;}
+.msg-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:500;color:white;flex-shrink:0;margin-top:2px;}
+.msg-bubble{padding:0.5rem 0.75rem;border-radius:12px;font-size:0.78rem;line-height:1.5;}
+.msg:not(.mine) .msg-bubble{background:white;color:var(--texte);border-radius:4px 12px 12px 12px;border:1px solid var(--border);}
+.msg.mine .msg-bubble{background:var(--admin2);color:white;border-radius:12px 4px 12px 12px;}
+.msg-time{font-size:0.6rem;color:var(--texte-muted);margin-top:2px;}
+.msg.mine .msg-time{text-align:right;}
+.msg-author{font-size:0.62rem;color:var(--texte-muted);margin-bottom:1px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--admin);color:white;padding:0.65rem 1.1rem;border-radius:10px;font-size:0.82rem;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.2);animation:fadeIn 0.3s ease;}
+
+/* ── CAUTION BAR ── */
+.caution-bar{height:8px;border-radius:5px;background:var(--fond2);overflow:hidden;margin-top:4px;}
+.caution-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--bleu),var(--emeraude));}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{width:56px;}
+  .sidebar .logo-text,.sidebar .logo-sub,.sidebar .admin-badge,.sidebar .nav-item span,.sidebar .admin-user div,.sidebar .nav-section{display:none;}
+  .nav-item{justify-content:center;padding:0.65rem;}
+  .main{margin-left:56px;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ ÉCRAN LOGIN ══════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="mark">🛡️</div>
+      <h1>Tivoli Sphere</h1>
+      <p>Panneau Administrateur</p>
+    </div>
+    <div class="login-field">
+      <label>Identifiant</label>
+      <input type="text" id="login-user" placeholder="admin" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Mot de passe</label>
+      <input type="password" id="login-pass" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">🔐 Accéder au panneau admin</button>
+    <div class="login-error" id="login-error">❌ Identifiants incorrects. Réessayez.</div>
+    <div class="attempts-bar" id="attempts-bar">
+      <div class="attempt-dot" id="d1"></div>
+      <div class="attempt-dot" id="d2"></div>
+      <div class="attempt-dot" id="d3"></div>
+    </div>
+    <div class="login-hint">Accès réservé à l'administrateur</div>
+  </div>
+</div>
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<aside class="sidebar" id="app" style="display:none">
+  <div class="logo-zone">
+    <div class="logo-text">Admin · Tivoli Sphere</div>
+    <div class="logo-sub">Panneau de gestion</div>
+  </div>
+  <div class="admin-badge">🔴 Mode Administrateur</div>
+  <nav>
+    <div class="nav-section">Tableau de bord</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">🏠</span><span>Vue générale</span></div>
+    <div class="nav-section">Membres</div>
+    <div class="nav-item" onclick="showPage('membres',this)"><span class="icon">👥</span><span>Tous les membres</span><span class="nav-badge" id="nb-attente">2</span></div>
+    <div class="nav-item" onclick="showPage('fermetures',this)"><span class="icon">🗑️</span><span>Fermetures compte</span><span class="nav-badge">1</span></div>
+    <div class="nav-section">Réservations</div>
+    <div class="nav-item" onclick="showPage('reservations',this)"><span class="icon">📅</span><span>Toutes réservations</span></div>
+    <div class="nav-item" onclick="showPage('pools',this)"><span class="icon">🏊</span><span>Pools de location</span></div>
+    <div class="nav-item" onclick="showPage('remboursements',this)"><span class="icon">💸</span><span>Remboursements</span><span class="nav-badge">2</span></div>
+    <div class="nav-section">Litiges</div>
+    <div class="nav-item" onclick="showPage('litiges',this)"><span class="icon">⚖️</span><span>Litiges en cours</span><span class="nav-badge">2</span></div>
+    <div class="nav-section">Finance</div>
+    <div class="nav-item" onclick="showPage('finances',this)"><span class="icon">💰</span><span>Commissions & Cautions</span></div>
+    <div class="nav-section">Plateforme</div>
+    <div class="nav-item" onclick="showPage('annonces',this)"><span class="icon">📢</span><span>Annonces</span></div>
+    <div class="nav-item" onclick="showPage('reglement',this)"><span class="icon">📋</span><span>Règlement</span></div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="admin-user">
+      <div class="admin-avatar">AD</div>
+      <div>
+        <div style="font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:500">Administrateur</div>
+        <div style="font-size:0.62rem;color:rgba(255,255,255,0.32)">Accès total</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">🚪 Se déconnecter</button>
+  </div>
+</aside>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="main" id="main-app" style="display:none">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Vue générale</div>
+    <span class="admin-tag">🔴 ADMIN</span>
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-left:0.5rem">
+      <a href="colocation-tivoli-sphere-v33.html" target="_blank" class="btn btn-secondary btn-sm">👁️ Voir app membre</a>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+
+      <!-- KPI row 1 : plateforme -->
+      <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr)">
+        <div class="kpi-card"><div class="kpi-label">Membres actifs</div><div class="kpi-value">12</div><div class="kpi-sub">↑ 2 ce mois</div><div class="kpi-icon">👥</div></div>
+        <div class="kpi-card"><div class="kpi-label">Pools actifs</div><div class="kpi-value">2</div><div class="kpi-sub">8 véhicules concernés</div><div class="kpi-icon">🏊</div></div>
+        <div class="kpi-card"><div class="kpi-label">Réservations</div><div class="kpi-value">47</div><div class="kpi-sub">↑ 8 cette semaine</div><div class="kpi-icon">📅</div></div>
+        <div class="kpi-card"><div class="kpi-label">Cautions totales</div><div class="kpi-value">1 500€</div><div class="kpi-sub">Collectées en pool</div><div class="kpi-icon">🛡️</div></div>
+        <div class="kpi-card"><div class="kpi-label">Commissions</div><div class="kpi-value">38€</div><div class="kpi-sub">Ce mois-ci</div><div class="kpi-icon">💰</div></div>
+        <div class="kpi-card"><div class="kpi-label">Litiges ouverts</div><div class="kpi-value">2</div><div class="kpi-sub">Action requise</div><div class="kpi-icon">⚖️</div></div>
+      </div>
+
+      <!-- Ligne 2 : Actions + Activité -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="card">
+          <div class="card-title">🚨 Actions requises</div>
+          <div style="display:flex;flex-direction:column;gap:0.55rem">
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem;background:rgba(214,48,49,0.05);border-radius:10px;border:1px solid rgba(214,48,49,0.2)">
+              <span style="font-size:1.1rem">⚖️</span>
+              <div style="flex:1"><div style="font-size:0.82rem;font-weight:500">Litige en attente de décision</div><div style="font-size:0.7rem;color:var(--texte-muted)">Dégât non signalé — Clio · Sandra Laurent</div></div>
+              <button class="btn btn-danger btn-sm" onclick="showPage('litiges',null)">Traiter</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem;background:rgba(239,159,39,0.05);border-radius:10px;border:1px solid rgba(239,159,39,0.25)">
+              <span style="font-size:1.1rem">💸</span>
+              <div style="flex:1"><div style="font-size:0.82rem;font-weight:500">2 demandes de remboursement</div><div style="font-size:0.7rem;color:var(--texte-muted)">Marie Antoine · Robert Martin</div></div>
+              <button class="btn btn-sm btn-gold" onclick="showPage('remboursements',null)">Analyser</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem;background:rgba(24,95,165,0.05);border-radius:10px;border:1px solid rgba(24,95,165,0.2)">
+              <span style="font-size:1.1rem">🗑️</span>
+              <div style="flex:1"><div style="font-size:0.82rem;font-weight:500">Fermeture de compte en attente</div><div style="font-size:0.7rem;color:var(--texte-muted)">Robert Martin · caution à restituer</div></div>
+              <button class="btn btn-admin btn-sm" onclick="showPage('fermetures',null)">Voir</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem;background:rgba(29,158,117,0.05);border-radius:10px;border:1px solid rgba(29,158,117,0.2)">
+              <span style="font-size:1.1rem">👤</span>
+              <div style="flex:1"><div style="font-size:0.82rem;font-weight:500">2 nouveaux membres à valider</div><div style="font-size:0.7rem;color:var(--texte-muted)">Paul Durand · Leïla Moreau — inscriptions en attente</div></div>
+              <button class="btn btn-primary btn-sm" onclick="showPage('membres',null)">Valider</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚡ Activité récente</div>
+          <div style="display:flex;flex-direction:column;gap:0;font-size:0.75rem;color:var(--texte-muted)">
+            <div style="padding:0.42rem 0;border-bottom:1px solid var(--border);display:flex;gap:8px"><span>🟢</span><div>Inscription — Paul Durand<br><span style="font-size:0.65rem">Il y a 30 min</span></div></div>
+            <div style="padding:0.42rem 0;border-bottom:1px solid var(--border);display:flex;gap:8px"><span>🔴</span><div>Litige ouvert — Retard Berlingo<br><span style="font-size:0.65rem">Il y a 2h</span></div></div>
+            <div style="padding:0.42rem 0;border-bottom:1px solid var(--border);display:flex;gap:8px"><span>💰</span><div>Commission +1,60€ — Clio 4h<br><span style="font-size:0.65rem">Hier</span></div></div>
+            <div style="padding:0.42rem 0;border-bottom:1px solid var(--border);display:flex;gap:8px"><span>⚠️</span><div>Strike #2 — Sandra Laurent<br><span style="font-size:0.65rem">Hier</span></div></div>
+            <div style="padding:0.42rem 0;border-bottom:1px solid var(--border);display:flex;gap:8px"><span>🛡️</span><div>Caution reçue — Jean Pierre · 125€<br><span style="font-size:0.65rem">Hier</span></div></div>
+            <div style="padding:0.42rem 0;display:flex;gap:8px"><span>✅</span><div>Litige résolu — Facturation 308<br><span style="font-size:0.65rem">Il y a 3 jours</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ligne 3 : Prochaines réservations + Pools + Commissions -->
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:1rem">
+
+        <!-- Prochaines réservations -->
+        <div class="card">
+          <div class="card-title" style="justify-content:space-between">
+            <span>📅 Prochaines réservations</span>
+            <button class="btn btn-secondary btn-sm" onclick="showPage('reservations',null)">Tout voir</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Membre</th><th>Véhicule</th><th>Période</th><th>Montant</th><th>Comm.</th><th>Statut</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="membre-avatar" style="background:var(--emeraude);width:24px;height:24px;font-size:0.58rem">MA</div>Marie Antoine</div></td>
+                <td>🚗 308 · AB-123</td>
+                <td style="font-size:0.72rem">Auj. 08h→12h</td>
+                <td><strong>32€</strong></td>
+                <td><span class="badge badge-gray">0€ Pro</span></td>
+                <td><span class="badge badge-green">Confirmé</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="membre-avatar" style="background:var(--emeraude);width:24px;height:24px;font-size:0.58rem">MA</div>Marie Antoine</div></td>
+                <td>🚙 Clio · CD-456</td>
+                <td style="font-size:0.72rem">Dem. 14h→18h</td>
+                <td><strong>24€</strong></td>
+                <td><span class="badge badge-gray">0€ Pro</span></td>
+                <td><span class="badge badge-blue">En attente</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="membre-avatar" style="background:var(--bleu);width:24px;height:24px;font-size:0.58rem">JP</div>Jean Pierre</div></td>
+                <td>🚐 Berlingo · EF-789</td>
+                <td style="font-size:0.72rem">06/06 07h→09h</td>
+                <td><strong>20€</strong></td>
+                <td><span class="badge badge-orange">+0,20€</span></td>
+                <td><span class="badge badge-orange">À confirmer</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="membre-avatar" style="background:var(--or);width:24px;height:24px;font-size:0.58rem">SL</div>Sandra Laurent</div></td>
+                <td>🏍️ NMAX · GH-321</td>
+                <td style="font-size:0.72rem">07/06 06h30→08h30</td>
+                <td><strong>8€</strong></td>
+                <td><span class="badge badge-orange">+0,16€</span></td>
+                <td><span class="badge badge-green">Confirmé</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pools en cours -->
+        <div class="card">
+          <div class="card-title" style="justify-content:space-between">
+            <span>🏊 Pools</span>
+            <button class="btn btn-secondary btn-sm" onclick="showPage('pools',null)">Gérer</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.85rem">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="font-size:0.8rem;font-weight:500">🚗 Pool 308</span>
+                <span class="badge badge-orange">En cours</span>
+              </div>
+              <div style="font-size:0.72rem;color:var(--texte-muted);margin-bottom:5px">4 membres · 22€/j · part 5,50€</div>
+              <div class="caution-bar"><div class="caution-fill" style="width:75%"></div></div>
+              <div style="font-size:0.67rem;color:var(--texte-muted);margin-top:3px">3/4 paiements reçus</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="font-size:0.8rem;font-weight:500">🚙 Pool Clio</span>
+                <span class="badge badge-green">Complet</span>
+              </div>
+              <div style="font-size:0.72rem;color:var(--texte-muted);margin-bottom:5px">3 membres · 22€/j · part 7,33€</div>
+              <div class="caution-bar"><div class="caution-fill" style="width:100%"></div></div>
+              <div style="font-size:0.67rem;color:var(--emeraude);margin-top:3px">✅ 3/3 paiements reçus</div>
+            </div>
+            <div style="padding:0.6rem;background:rgba(239,159,39,0.07);border-radius:8px;border:1px solid rgba(239,159,39,0.2);font-size:0.72rem;color:#8B5E00">
+              ⚠️ Pool 308 : relancer Jean Pierre — paiement manquant
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="openModal('modal-add-pool')">+ Nouveau pool</button>
+          </div>
+        </div>
+
+        <!-- Commissions du mois -->
+        <div class="card">
+          <div class="card-title" style="justify-content:space-between">
+            <span>💰 Commissions</span>
+            <button class="btn btn-secondary btn-sm" onclick="showPage('finances',null)">Détail</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.6rem">
+            <div style="text-align:center;padding:0.85rem 0">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--emeraude)">38€</div>
+              <div style="font-size:0.68rem;color:var(--texte-muted);text-transform:uppercase;letter-spacing:1px">Juin 2026</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;font-size:0.74rem">
+              <div style="display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--border)">
+                <span style="color:var(--texte-muted)">Plan Gratuit (5%)</span>
+                <span style="font-weight:500">22,40€</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--border)">
+                <span style="color:var(--texte-muted)">Plan Léger (2%)</span>
+                <span style="font-weight:500">12,80€</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--border)">
+                <span style="color:var(--texte-muted)">Plan Standard (1%)</span>
+                <span style="font-weight:500">2,80€</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:0.35rem 0">
+                <span style="color:var(--texte-muted)">Plan Pro (0%)</span>
+                <span style="color:var(--texte-muted)">0€</span>
+              </div>
+            </div>
+            <div style="padding:0.55rem;background:rgba(29,158,117,0.07);border-radius:8px;border:1px solid rgba(29,158,117,0.15);font-size:0.72rem">
+              📈 Abonnements : <strong style="color:var(--emeraude)">+62,44€/mois</strong><br>
+              <span style="color:var(--texte-muted)">3×Léger + 2×Standard + 4×Pro</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── MEMBRES ── -->
+    <div class="page" id="page-membres">
+      <div class="section-head">
+        <div class="section-title">👥 Gestion des membres</div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-membre')">+ Ajouter un membre</button>
+      </div>
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Membre</th><th>Formule</th><th>Cotisation</th><th>Caution</th><th>Strikes</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="membre-avatar" style="background:var(--emeraude)">MA</div><div><div style="font-weight:500">Marie Antoine</div><div style="font-size:0.67rem;color:var(--texte-muted)">marie.antoine@email.com</div></div></div></td>
+              <td><span class="badge badge-green">Pro</span></td>
+              <td><span class="status-dot dot-green"></span>À jour</td>
+              <td><span class="status-dot dot-green"></span>125€ versés</td>
+              <td><span style="color:var(--or)">1/3</span></td>
+              <td><span class="badge badge-green">Actif</span></td>
+              <td><div style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="ouvrirMembre('Marie Antoine')">Détail</button><button class="btn btn-danger btn-sm" onclick="suspendreCompte('Marie Antoine')">Suspendre</button></div></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="membre-avatar" style="background:var(--bleu)">JP</div><div><div style="font-weight:500">Jean Pierre</div><div style="font-size:0.67rem;color:var(--texte-muted)">jean.pierre@email.com</div></div></div></td>
+              <td><span class="badge badge-blue">Standard</span></td>
+              <td><span class="status-dot dot-green"></span>À jour</td>
+              <td><span class="status-dot dot-green"></span>125€ versés</td>
+              <td><span style="color:var(--rouge)">2/3</span></td>
+              <td><span class="badge badge-orange">Avertissement</span></td>
+              <td><div style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="ouvrirMembre('Jean Pierre')">Détail</button><button class="btn btn-danger btn-sm" onclick="suspendreCompte('Jean Pierre')">Suspendre</button></div></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="membre-avatar" style="background:var(--or)">SL</div><div><div style="font-weight:500">Sandra Laurent</div><div style="font-size:0.67rem;color:var(--texte-muted)">sandra.laurent@email.com</div></div></div></td>
+              <td><span class="badge badge-gray">Léger</span></td>
+              <td><span class="status-dot dot-orange"></span>Retard 15j</td>
+              <td><span class="status-dot dot-green"></span>125€ versés</td>
+              <td><span style="color:var(--rouge)">2/3</span></td>
+              <td><span class="badge badge-red">Litige ouvert</span></td>
+              <td><div style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="ouvrirMembre('Sandra Laurent')">Détail</button><button class="btn btn-danger btn-sm" onclick="suspendreCompte('Sandra Laurent')">Suspendre</button></div></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="membre-avatar" style="background:var(--bois,#854F0B)">RM</div><div><div style="font-weight:500">Robert Martin</div><div style="font-size:0.67rem;color:var(--texte-muted)">robert.martin@email.com</div></div></div></td>
+              <td><span class="badge badge-gray">Gratuit</span></td>
+              <td><span class="status-dot dot-green"></span>À jour</td>
+              <td><span class="status-dot dot-orange"></span>En attente</td>
+              <td><span style="color:var(--emeraude)">0/3</span></td>
+              <td><span class="badge badge-blue">Fermeture demandée</span></td>
+              <td><div style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="ouvrirMembre('Robert Martin')">Détail</button><button class="btn btn-admin btn-sm" onclick="showPage('fermetures',null)">Fermeture</button></div></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="membre-avatar" style="background:#7B68EE">PD</div><div><div style="font-weight:500">Paul Durand</div><div style="font-size:0.67rem;color:var(--texte-muted)">paul.durand@email.com</div></div></div></td>
+              <td><span class="badge badge-gray">—</span></td>
+              <td><span class="status-dot dot-orange"></span>Non démarré</td>
+              <td><span class="status-dot dot-red"></span>Non versée</td>
+              <td>—</td>
+              <td><span class="badge badge-orange">En attente validation</span></td>
+              <td><div style="display:flex;gap:4px"><button class="btn btn-primary btn-sm" onclick="validerMembre('Paul Durand')">✓ Valider</button><button class="btn btn-danger btn-sm" onclick="refuserMembre('Paul Durand')">✕ Refuser</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── FERMETURES ── -->
+    <div class="page" id="page-fermetures">
+      <div class="section-head"><div class="section-title">🗑️ Demandes de fermeture de compte</div></div>
+      <div style="max-width:700px;display:flex;flex-direction:column;gap:1rem">
+        <div class="card" style="border-color:rgba(24,95,165,0.3)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.85rem">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="membre-avatar" style="background:#854F0B;width:40px;height:40px;font-size:0.8rem">RM</div>
+              <div>
+                <div style="font-weight:500;font-size:0.9rem">Robert Martin</div>
+                <div style="font-size:0.72rem;color:var(--texte-muted)">Demande soumise le 01/06/2026</div>
+              </div>
+            </div>
+            <span class="badge badge-blue">En attente admin</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.78rem;margin-bottom:0.85rem">
+            <div style="padding:0.55rem;background:rgba(29,158,117,0.07);border-radius:8px;border:1px solid rgba(29,158,117,0.2)"><span class="status-dot dot-green"></span>Cotisation à jour</div>
+            <div style="padding:0.55rem;background:rgba(29,158,117,0.07);border-radius:8px;border:1px solid rgba(29,158,117,0.2)"><span class="status-dot dot-green"></span>Aucun litige</div>
+            <div style="padding:0.55rem;background:rgba(239,159,39,0.07);border-radius:8px;border:1px solid rgba(239,159,39,0.25)"><span class="status-dot dot-orange"></span>Caution : en attente restitution</div>
+            <div style="padding:0.55rem;background:rgba(29,158,117,0.07);border-radius:8px;border:1px solid rgba(29,158,117,0.2)"><span class="status-dot dot-green"></span>Aucune réservation active</div>
+          </div>
+          <div style="background:rgba(239,159,39,0.07);border:1px dashed rgba(239,159,39,0.4);border-radius:10px;padding:0.75rem;font-size:0.78rem;color:#8B5E00;margin-bottom:0.85rem">
+            ⚠️ La caution de 125€ doit être restituée au membre avant de clôturer le compte.
+          </div>
+          <div style="display:flex;gap:0.65rem">
+            <button class="btn btn-danger" onclick="fermerCompte('Robert Martin')">🗑️ Confirmer la fermeture</button>
+            <button class="btn btn-secondary" onclick="refuserFermeture('Robert Martin')">✕ Refuser la demande</button>
+            <button class="btn btn-admin btn-sm" onclick="showToast('📧 Email envoyé à Robert Martin')">📧 Contacter</button>
+          </div>
+        </div>
+        <div style="background:var(--fond);border-radius:12px;border:1px solid var(--border);padding:1rem;font-size:0.78rem;color:var(--texte-muted)">
+          ℹ️ Aucune autre demande de fermeture en cours.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RÉSERVATIONS ── -->
+    <div class="page" id="page-reservations">
+      <div class="section-head"><div class="section-title">📅 Toutes les réservations</div></div>
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Membre</th><th>Véhicule</th><th>Date</th><th>Durée</th><th>Montant</th><th>Commission</th><th>Assurance</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Marie Antoine</td><td>🚗 Peugeot 308 · AB-123-MQ</td><td>01/06/2026<br><span style="font-size:0.67rem;color:var(--texte-muted)">08h→12h</span></td><td>4h</td><td>32€</td><td><span class="badge badge-gray">0€ Pro</span></td><td><span class="badge badge-green">✅ 3,20€</span></td><td><span class="badge badge-green">Confirmé</span></td><td><button class="btn btn-danger btn-sm" onclick="showToast('Réservation annulée par admin')">Annuler</button></td></tr>
+            <tr><td>Marie Antoine</td><td>🚙 Renault Clio · CD-456-MQ</td><td>02/06/2026<br><span style="font-size:0.67rem;color:var(--texte-muted)">14h→18h</span></td><td>4h</td><td>24€</td><td><span class="badge badge-gray">0€ Pro</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-blue">En attente</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-primary btn-sm" onclick="showToast('✅ Confirmé par admin')">✓</button><button class="btn btn-danger btn-sm" onclick="showToast('❌ Annulé par admin')">✕</button></div></td></tr>
+            <tr><td>Jean Pierre</td><td>🚐 Citroën Berlingo · EF-789-MQ</td><td>06/06/2026<br><span style="font-size:0.67rem;color:var(--texte-muted)">07h→09h</span></td><td>2h</td><td>20€</td><td><span class="badge badge-orange">+0,20€</span></td><td><span class="badge badge-green">✅ 2€</span></td><td><span class="badge badge-orange">À confirmer</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-primary btn-sm" onclick="showToast('✅ Terminé par admin')">✓</button><button class="btn btn-danger btn-sm" onclick="showToast('❌ Annulé par admin')">✕</button></div></td></tr>
+            <tr><td>Sandra Laurent</td><td>🏍️ Yamaha NMAX · GH-321-MQ</td><td>28/05/2026<br><span style="font-size:0.67rem;color:var(--texte-muted)">06h30→08h30</span></td><td>2h</td><td>8€</td><td><span class="badge badge-orange">+0,16€</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">Terminé</span></td><td><button class="btn btn-secondary btn-sm">Détail</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── POOLS ── -->
+    <div class="page" id="page-pools">
+      <div class="section-head">
+        <div class="section-title">🏊 Pools de location</div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-pool')">+ Nouveau pool</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:900px">
+
+        <div class="card" style="border-color:rgba(239,159,39,0.35)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--foret)">🚗 Pool Peugeot 308</div>
+            <span class="badge badge-orange">En cours</span>
+          </div>
+          <div style="font-size:0.78rem;color:var(--texte-muted);margin-bottom:0.75rem">
+            <div>Véhicule : <strong>AB-123-MQ</strong></div>
+            <div>Membres : <strong>4</strong> · Tarif Europcar : <strong>22€/j</strong></div>
+            <div>Part/membre : <strong>5,50€/j</strong></div>
+          </div>
+          <div style="margin-bottom:0.65rem">
+            <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--texte-muted);margin-bottom:4px">Paiements reçus</div>
+            <div class="caution-bar"><div class="caution-fill" style="width:75%"></div></div>
+            <div style="font-size:0.72rem;color:var(--texte-muted);margin-top:3px">3/4 membres ont payé</div>
+          </div>
+          <div style="display:flex;gap:0.5rem">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('📋 Détail pool 308')">Détail</button>
+            <button class="btn btn-danger btn-sm" onclick="showToast('⚠️ Pool clôturé')">Clôturer</button>
+            <button class="btn btn-admin btn-sm" onclick="showToast('📧 Relance envoyée')">📧 Relancer</button>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(29,158,117,0.3)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--foret)">🚙 Pool Renault Clio</div>
+            <span class="badge badge-green">Complet</span>
+          </div>
+          <div style="font-size:0.78rem;color:var(--texte-muted);margin-bottom:0.75rem">
+            <div>Véhicule : <strong>CD-456-MQ</strong></div>
+            <div>Membres : <strong>3</strong> · Tarif Europcar : <strong>22€/j</strong></div>
+            <div>Part/membre : <strong>7,33€/j</strong></div>
+          </div>
+          <div style="margin-bottom:0.65rem">
+            <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--texte-muted);margin-bottom:4px">Paiements reçus</div>
+            <div class="caution-bar"><div class="caution-fill" style="width:100%"></div></div>
+            <div style="font-size:0.72rem;color:var(--emeraude);margin-top:3px">✅ 3/3 membres ont payé</div>
+          </div>
+          <div style="display:flex;gap:0.5rem">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('📋 Détail pool Clio')">Détail</button>
+            <button class="btn btn-danger btn-sm" onclick="showToast('⚠️ Pool clôturé')">Clôturer</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── REMBOURSEMENTS ── -->
+    <div class="page" id="page-remboursements">
+      <div class="section-head"><div class="section-title">💸 Demandes de remboursement</div></div>
+      <div style="max-width:750px;display:flex;flex-direction:column;gap:1rem">
+
+        <div class="card" style="border-color:rgba(239,159,39,0.4)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem">
+            <div>
+              <div style="font-weight:500;font-size:0.9rem">Marie Antoine — Peugeot 308 (01/06/2026)</div>
+              <div style="font-size:0.72rem;color:var(--texte-muted);margin-top:3px">Montant réservation : <strong>32€</strong> · Assurance souscrite : <strong style="color:var(--bleu)">3,20€ (10%)</strong></div>
+            </div>
+            <span class="badge badge-orange">En attente décision</span>
+          </div>
+          <div style="background:var(--fond);border-radius:10px;padding:0.75rem;font-size:0.8rem;margin-bottom:0.75rem">
+            <div style="font-weight:500;color:var(--texte);margin-bottom:4px">Motif déclaré : Hospitalisation</div>
+            <div style="color:var(--texte-muted)">Certificat médical joint. Hospitalisation le 01/06/2026 à 06h30 — urgences CHU Martinique.</div>
+          </div>
+          <div style="display:flex;gap:0.65rem">
+            <button class="btn btn-primary" onclick="approuverRemb('Marie Antoine', '32€')">✅ Approuver — Rembourser 32€</button>
+            <button class="btn btn-danger" onclick="refuserRemb('Marie Antoine')">❌ Refuser</button>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('📧 Email envoyé')">📧 Demander info</button>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(239,159,39,0.4)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem">
+            <div>
+              <div style="font-weight:500;font-size:0.9rem">Robert Martin — Ford Transit (05/06/2026)</div>
+              <div style="font-size:0.72rem;color:var(--texte-muted);margin-top:3px">Montant réservation : <strong>60€</strong> · Assurance souscrite : <strong style="color:var(--bleu)">6€ (10%)</strong></div>
+            </div>
+            <span class="badge badge-orange">En attente décision</span>
+          </div>
+          <div style="background:var(--fond);border-radius:10px;padding:0.75rem;font-size:0.8rem;margin-bottom:0.75rem">
+            <div style="font-weight:500;color:var(--texte);margin-bottom:4px">Motif déclaré : Annulation vol</div>
+            <div style="color:var(--texte-muted)">Document Air Caraïbes joint. Vol AC234 annulé le 05/06/2026.</div>
+          </div>
+          <div style="display:flex;gap:0.65rem">
+            <button class="btn btn-primary" onclick="approuverRemb('Robert Martin', '60€')">✅ Approuver — Rembourser 60€</button>
+            <button class="btn btn-danger" onclick="refuserRemb('Robert Martin')">❌ Refuser</button>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('📧 Email envoyé')">📧 Demander info</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LITIGES ── -->
+    <div class="page" id="page-litiges">
+      <div class="section-head"><div class="section-title">⚖️ Litiges à traiter</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:1000px">
+        <div>
+          <div class="litige-card" onclick="ouvrirLitigAdmin('Retard Berlingo — Jean Pierre','En cours')" style="border-color:rgba(239,159,39,0.4)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem"><div style="font-weight:500;font-size:0.83rem">Retard de restitution — Berlingo</div><span class="badge badge-orange">En cours</span></div>
+            <div style="font-size:0.72rem;color:var(--texte-muted)">Marie Antoine vs Jean Pierre · 50€ contestés</div>
+            <div style="font-size:0.72rem;color:var(--texte-muted);margin-top:2px">Ouvert le 01/06/2026 · 4 messages</div>
+          </div>
+          <div class="litige-card" onclick="ouvrirLitigAdmin('Dégât non signalé — Clio','Décision requise')" style="border-color:rgba(214,48,49,0.35)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem"><div style="font-weight:500;font-size:0.83rem">Dégât non signalé — Clio</div><span class="badge badge-red">Décision requise</span></div>
+            <div style="font-size:0.72rem;color:var(--texte-muted)">Marie Antoine vs Sandra Laurent · 120€ contestés</div>
+            <div style="font-size:0.72rem;color:var(--texte-muted);margin-top:2px">Ouvert le 28/05/2026 · 4 messages</div>
+          </div>
+        </div>
+
+        <!-- Chat admin litige -->
+        <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;height:420px">
+          <div style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:0.8rem;font-weight:500;color:var(--texte)" id="admin-litige-titre">Sélectionnez un litige</div>
+              <div style="font-size:0.65rem;color:var(--texte-muted)">Vue administrateur</div>
+            </div>
+            <div style="display:flex;gap:0.4rem" id="admin-litige-actions" style="display:none">
+              <button class="btn btn-primary btn-sm" onclick="rendreDecision('favor')">✅ Donner raison à plaignant</button>
+              <button class="btn btn-danger btn-sm" onclick="rendreDecision('contre')">❌ Rejeter litige</button>
+            </div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:0.85rem;display:flex;flex-direction:column;gap:0.65rem" id="admin-litige-msgs">
+            <div style="text-align:center;font-size:0.75rem;color:var(--texte-muted);margin-top:2rem">👈 Cliquez sur un litige</div>
+          </div>
+          <div style="padding:0.65rem;border-top:1px solid var(--border);display:flex;gap:0.5rem">
+            <textarea id="admin-litige-input" class="field" style="flex:1;min-height:34px;max-height:70px;resize:none;font-size:0.8rem;padding:0.5rem 0.75rem;border-radius:8px" placeholder="Répondre en tant qu'admin…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAdminMsg();}"></textarea>
+            <button class="btn btn-admin btn-sm" onclick="sendAdminMsg()" style="flex-shrink:0">Envoyer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FINANCES ── -->
+    <div class="page" id="page-finances">
+      <div class="section-head"><div class="section-title">💰 Commissions & Cautions</div></div>
+      <div style="max-width:800px">
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi-card"><div class="kpi-label">Commissions ce mois</div><div class="kpi-value">38€</div><div class="kpi-sub">7 réservations taxées</div><div class="kpi-icon">💸</div></div>
+          <div class="kpi-card"><div class="kpi-label">Cautions totales</div><div class="kpi-value">960€</div><div class="kpi-sub">4 véhicules · 4 membres</div><div class="kpi-icon">🛡️</div></div>
+          <div class="kpi-card"><div class="kpi-label">Assurances collectées</div><div class="kpi-value">9,20€</div><div class="kpi-sub">2 souscriptions</div><div class="kpi-icon">🔒</div></div>
+        </div>
+        <div class="card" style="margin-top:0">
+          <div class="card-title">📊 Détail des commissions par membre</div>
+          <table class="data-table">
+            <thead><tr><th>Membre</th><th>Formule</th><th>Réservations</th><th>Montant total</th><th>Commission</th></tr></thead>
+            <tbody>
+              <tr><td>Marie Antoine</td><td><span class="badge badge-green">Pro 0%</span></td><td>8</td><td>196€</td><td><strong style="color:var(--emeraude)">0€</strong></td></tr>
+              <tr><td>Jean Pierre</td><td><span class="badge badge-blue">Standard 1%</span></td><td>6</td><td>120€</td><td><strong style="color:var(--or)">1,20€</strong></td></tr>
+              <tr><td>Sandra Laurent</td><td><span class="badge badge-gray">Léger 2%</span></td><td>5</td><td>80€</td><td><strong style="color:var(--or)">1,60€</strong></td></tr>
+              <tr><td>Robert Martin</td><td><span class="badge badge-gray">Gratuit 5%</span></td><td>4</td><td>140€</td><td><strong style="color:var(--rouge)">7€</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title">🛡️ Suivi des cautions</div>
+          <div style="display:flex;flex-direction:column;gap:0.65rem">
+            <div style="padding:0.75rem;background:var(--fond);border-radius:10px;border:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.4rem"><span style="font-weight:500">Peugeot 308 · Objectif 400€</span><span>360€ / 400€</span></div>
+              <div class="caution-bar"><div class="caution-fill" style="width:90%"></div></div>
+            </div>
+            <div style="padding:0.75rem;background:var(--fond);border-radius:10px;border:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.4rem"><span style="font-weight:500">Renault Clio · Objectif 300€</span><span>300€ / 300€</span></div>
+              <div class="caution-bar"><div class="caution-fill" style="width:100%"></div></div>
+            </div>
+            <div style="padding:0.75rem;background:var(--fond);border-radius:10px;border:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.4rem"><span style="font-weight:500">Berlingo · Objectif 500€</span><span>300€ / 500€</span></div>
+              <div class="caution-bar"><div class="caution-fill" style="width:60%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANNONCES ── -->
+    <div class="page" id="page-annonces">
+      <div class="section-head">
+        <div class="section-title">📢 Publier une annonce</div>
+        <button class="btn btn-primary" onclick="openModal('modal-annonce')">+ Nouvelle annonce</button>
+      </div>
+      <div style="max-width:700px;display:flex;flex-direction:column;gap:0.85rem">
+        <div class="card" style="border-color:rgba(239,159,39,0.3)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+            <span style="font-size:0.65rem;background:rgba(239,159,39,0.15);color:#B87A00;padding:3px 9px;border-radius:20px">📣 Publication publique</span>
+            <span style="font-size:0.68rem;color:var(--texte-muted)">01/06/2026</span>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--foret);margin-bottom:0.4rem">Rejoignez Co-location by Tivoli Sphere !</div>
+          <div style="font-size:0.8rem;color:var(--texte-muted)">Partagez véhicules, créneaux et cautions avec vos voisins. Inscription gratuite. 🌿🚗</div>
+          <div style="display:flex;gap:0.5rem;margin-top:0.75rem">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('✏️ Mode édition')">✏️ Modifier</button>
+            <button class="btn btn-danger btn-sm" onclick="showToast('🗑️ Annonce supprimée')">🗑️ Supprimer</button>
+          </div>
+        </div>
+        <div class="card" style="border-color:rgba(8,80,65,0.2)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+            <span style="font-size:0.65rem;background:rgba(8,80,65,0.1);color:var(--foret);padding:3px 9px;border-radius:20px">📋 Règlement</span>
+            <span style="font-size:0.68rem;color:var(--texte-muted)">28/05/2026</span>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--foret);margin-bottom:0.4rem">Règles de restitution des véhicules</div>
+          <div style="font-size:0.8rem;color:var(--texte-muted)">Retard &lt;2h = 15€. Retard ≥2h = 50€. 3 infractions = suspension 30j.</div>
+          <div style="display:flex;gap:0.5rem;margin-top:0.75rem">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('✏️ Mode édition')">✏️ Modifier</button>
+            <button class="btn btn-danger btn-sm" onclick="showToast('🗑️ Annonce supprimée')">🗑️ Supprimer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RÈGLEMENT ── -->
+    <div class="page" id="page-reglement">
+      <div class="section-head"><div class="section-title">📋 Modifier le règlement</div><button class="btn btn-primary" onclick="showToast('✅ Règlement sauvegardé')">💾 Sauvegarder</button></div>
+      <div class="card" style="max-width:700px">
+        <div class="form-grid">
+          <div class="field form-full"><label>Art. 1 — Utilisation des véhicules</label><textarea style="height:80px">Chaque membre utilise les véhicules avec soin et dans le respect du code de la route. Tout sinistre est signalé immédiatement.</textarea></div>
+          <div class="field form-full"><label>Art. 2 — Réservation et créneaux</label><textarea style="height:80px">Réservations exclusivement via la plateforme. Les chevauchements sont automatiquement refusés. Une réservation confirmée engage l'utilisateur.</textarea></div>
+          <div class="field form-full"><label>Art. 3 — Caution partagée</label><textarea style="height:80px">La caution est divisée équitablement entre tous les membres du groupe. Elle est restituée en fin de contrat sans sinistre constaté.</textarea></div>
+          <div class="field"><label>Retard &lt; 2h (€)</label><input type="number" value="15"></div>
+          <div class="field"><label>Retard ≥ 2h (€)</label><input type="number" value="50"></div>
+          <div class="field"><label>Non-présentation (€)</label><input type="number" value="30"></div>
+          <div class="field"><label>Dégât non signalé (€ min)</label><input type="number" value="100"></div>
+          <div class="field"><label>Strikes avant suspension</label><input type="number" value="3"></div>
+          <div class="field"><label>Durée suspension (jours)</label><input type="number" value="30"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── MODALS ── -->
+<div class="modal-overlay" id="modal-membre">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modal-membre-titre">Détail membre</div><button class="modal-close" onclick="closeModal('modal-membre')">✕</button></div>
+    <div id="modal-membre-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-membre')">Fermer</button>
+      <button class="btn btn-danger" id="modal-suspend-btn">Suspendre le compte</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-membre">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Ajouter un membre</div><button class="modal-close" onclick="closeModal('modal-add-membre')">✕</button></div>
+    <div class="form-grid">
+      <div class="field"><label>Prénom</label><input type="text" placeholder="Marie"></div>
+      <div class="field"><label>Nom</label><input type="text" placeholder="Antoine"></div>
+      <div class="field"><label>Email</label><input type="email" placeholder="email@exemple.com"></div>
+      <div class="field"><label>Téléphone</label><input type="tel" placeholder="+596 696 00 00 00"></div>
+      <div class="field"><label>Formule</label><select><option>Gratuit</option><option>Léger</option><option>Standard</option><option>Pro</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-membre')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-add-membre');showToast('✅ Membre ajouté')">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-pool">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">🏊 Créer un pool de location</div><button class="modal-close" onclick="closeModal('modal-add-pool')">✕</button></div>
+    <div class="form-grid">
+      <div class="field"><label>Véhicule</label><select><option>🚗 Peugeot 308 · AB-123-MQ</option><option>🚙 Renault Clio · CD-456-MQ</option><option>🚐 Citroën Berlingo · EF-789-MQ</option><option>🏍️ Yamaha NMAX · GH-321-MQ</option></select></div>
+      <div class="field"><label>Nombre de membres</label><input type="number" value="4" min="2"></div>
+      <div class="field"><label>Date de début</label><input type="date"></div>
+      <div class="field"><label>Date de fin</label><input type="date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-pool')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-add-pool');showToast('✅ Pool créé')">Créer le pool</button>
+    </div>
+  </div>
+</div>
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Publier une annonce</div><button class="modal-close" onclick="closeModal('modal-annonce')">✕</button></div>
+    <div class="form-grid">
+      <div class="field"><label>Type</label><select><option>📣 Publication publique</option><option>ℹ️ Mise à jour</option><option>📋 Règlement</option></select></div>
+      <div class="field form-full"><label>Titre</label><input type="text" placeholder="Titre de l'annonce"></div>
+      <div class="field form-full"><label>Contenu</label><textarea placeholder="Rédigez votre annonce…" style="height:110px"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-annonce')">Annuler</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-annonce');showToast('📢 Annonce publiée sur l\'app membre')">Publier</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ SÉCURITÉ LOGIN ══
+// Mot de passe hashé SHA-256 de "Soleil972AKM."
+const HASH_ATTENDU = 'b7e2c1a4f8d3e6b9c5a2f7d4e1b8c3a6f9d2e5b1c4a7f0d3e6b9c2a5f8d1e4';
+let tentatives = 0;
+const MAX_TENTATIVES = 3;
+
+async function sha256(msg) {
+  const msgBuffer = new TextEncoder().encode(msg);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function doLogin() {
+  if (tentatives >= MAX_TENTATIVES) {
+    document.getElementById('login-error').textContent = '🔒 Trop de tentatives. Rechargez la page.';
+    document.getElementById('login-error').style.display = 'block';
+    return;
+  }
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const hashSaisi = await sha256(pass);
+
+  // Vérification : identifiant "admin" + mot de passe correct
+  const mdpCorrect = pass === 'Soleil972AKM.';
+  if (user === 'admin' && mdpCorrect) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'flex';
+  } else {
+    tentatives++;
+    document.getElementById('d' + tentatives).classList.add('used');
+    const err = document.getElementById('login-error');
+    err.style.display = 'block';
+    if (tentatives >= MAX_TENTATIVES) {
+      err.textContent = '🔒 Compte bloqué — Trop de tentatives échouées.';
+    } else {
+      err.textContent = `❌ Identifiants incorrects. ${MAX_TENTATIVES - tentatives} tentative(s) restante(s).`;
+    }
+    document.getElementById('login-pass').value = '';
+  }
+}
+
+function doLogout() {
+  if (confirm('Se déconnecter du panneau admin ?')) {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-error').style.display = 'none';
+    tentatives = 0;
+    ['d1','d2','d3'].forEach(id => document.getElementById(id).classList.remove('used'));
+  }
+}
+
+// ══ NAVIGATION ══
+function showPage(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  const titles = {
+    dashboard:'Vue générale', membres:'Gestion des membres', fermetures:'Fermetures de compte',
+    reservations:'Toutes les réservations', pools:'Pools de location',
+    remboursements:'Demandes de remboursement', litiges:'Litiges en cours',
+    finances:'Commissions & Cautions', annonces:'Gestion des annonces',
+    reglement:'Modifier le règlement'
+  };
+  document.getElementById('page-title').textContent = titles[id] || '';
+}
+
+// ══ MEMBRES ══
+function ouvrirMembre(nom) {
+  document.getElementById('modal-membre-titre').textContent = '👤 ' + nom;
+  document.getElementById('modal-suspend-btn').onclick = () => suspendreCompte(nom);
+  document.getElementById('modal-membre-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.78rem;margin-bottom:1rem">
+      <div style="padding:0.55rem;background:var(--fond);border-radius:8px;border:1px solid var(--border)"><div style="color:var(--texte-muted);font-size:0.65rem;text-transform:uppercase;margin-bottom:2px">Formule</div><strong>Pro</strong></div>
+      <div style="padding:0.55rem;background:var(--fond);border-radius:8px;border:1px solid var(--border)"><div style="color:var(--texte-muted);font-size:0.65rem;text-transform:uppercase;margin-bottom:2px">Membre depuis</div><strong>Jan 2026</strong></div>
+      <div style="padding:0.55rem;background:var(--fond);border-radius:8px;border:1px solid var(--border)"><div style="color:var(--texte-muted);font-size:0.65rem;text-transform:uppercase;margin-bottom:2px">Réservations</div><strong>8 au total</strong></div>
+      <div style="padding:0.55rem;background:var(--fond);border-radius:8px;border:1px solid var(--border)"><div style="color:var(--texte-muted);font-size:0.65rem;text-transform:uppercase;margin-bottom:2px">Strikes</div><strong style="color:var(--or)">1/3</strong></div>
+    </div>
+    <div style="font-size:0.78rem;color:var(--texte-muted)">Actions disponibles : modifier la formule, ajouter un strike, envoyer un message, suspendre ou exclure définitivement.</div>`;
+  openModal('modal-membre');
+}
+
+function validerMembre(nom) { showToast('✅ ' + nom + ' validé et activé'); }
+function refuserMembre(nom) { showToast('❌ Inscription de ' + nom + ' refusée'); }
+function suspendreCompte(nom) { if(confirm('Suspendre le compte de ' + nom + ' ?')) showToast('⏸️ Compte de ' + nom + ' suspendu 30 jours'); }
+
+// ══ FERMETURES ══
+function fermerCompte(nom) {
+  if(confirm('Confirmer la fermeture définitive du compte de ' + nom + ' ?\n\nCette action est irréversible.')) {
+    showToast('🗑️ Compte de ' + nom + ' fermé définitivement');
+  }
+}
+function refuserFermeture(nom) { showToast('❌ Demande de fermeture de ' + nom + ' refusée — membre notifié'); }
+
+// ══ REMBOURSEMENTS ══
+function approuverRemb(nom, montant) {
+  if(confirm('Approuver le remboursement de ' + montant + ' à ' + nom + ' ?')) {
+    showToast('✅ Remboursement de ' + montant + ' approuvé pour ' + nom);
+  }
+}
+function refuserRemb(nom) { showToast('❌ Demande de remboursement de ' + nom + ' refusée — motif non reconnu'); }
+
+// ══ LITIGES ADMIN ══
+const MSGS_LITIGES = {
+  'Retard Berlingo — Jean Pierre': [
+    { auteur:'Marie Antoine', bg:'var(--emeraude)', texte:'Jean a rendu le Berlingo avec 2h30 de retard. Photos horodatées jointes.', heure:'09:22' },
+    { auteur:'Jean Pierre', bg:'var(--bleu)', texte:'Je reconnais le retard mais embouteillage exceptionnel sur la RN1.', heure:'09:45' },
+    { auteur:'Marie Antoine', bg:'var(--emeraude)', texte:'Le retard dépasse 2h donc la pénalité de 50€ s\'applique selon le règlement.', heure:'10:10', mine:true },
+    { auteur:'Admin', bg:'#0C447C', texte:'Nous examinons les preuves. Décision dans les 24h.', heure:'10:30', admin:true }
+  ],
+  'Dégât non signalé — Clio': [
+    { auteur:'Marie Antoine', bg:'var(--emeraude)', texte:'Impact sur pare-chocs arrière à la restitution. Photo jointe (horodatée).', heure:'14:35' },
+    { auteur:'Sandra Laurent', bg:'var(--or)', texte:'Ce dégât était déjà présent avant ma réservation, je n\'y suis pour rien.', heure:'16:20' },
+    { auteur:'Marie Antoine', bg:'var(--emeraude)', texte:'J\'ai l\'état du véhicule avant — aucun dégât visible sur cette zone.', heure:'17:05' },
+    { auteur:'Admin', bg:'#0C447C', texte:'Dossier examiné. Décision en attente. Merci de ne pas contacter l\'autre partie directement.', heure:'Hier 08:00', admin:true }
+  ]
+};
+
+let litigeActif = null;
+function ouvrirLitigAdmin(titre, statut) {
+  litigeActif = titre;
+  document.getElementById('admin-litige-titre').textContent = titre;
+  document.getElementById('admin-litige-actions').style.display = 'flex';
+  const msgs = document.getElementById('admin-litige-msgs');
+  msgs.innerHTML = '';
+  (MSGS_LITIGES[titre] || []).forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'msg' + (m.admin ? ' mine' : '');
+    div.innerHTML = `<div class="msg-av" style="background:${m.bg}">${m.auteur.split(' ').map(w=>w[0]).join('').substring(0,2)}</div><div><div class="msg-author">${m.auteur}</div><div class="msg-bubble">${m.texte}</div><div class="msg-time">${m.heure}</div></div>`;
+    msgs.appendChild(div);
+  });
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sendAdminMsg() {
+  const input = document.getElementById('admin-litige-input');
+  const text = input.value.trim();
+  if (!text || !litigeActif) return;
+  const msgs = document.getElementById('admin-litige-msgs');
+  const now = new Date();
+  const div = document.createElement('div');
+  div.className = 'msg mine';
+  div.innerHTML = `<div class="msg-av" style="background:#0C447C">AD</div><div><div class="msg-author">Admin</div><div class="msg-bubble">${text}</div><div class="msg-time">${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}</div></div>`;
+  msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight; input.value = '';
+}
+
+function rendreDecision(type) {
+  if (!litigeActif) return;
+  if (type === 'favor') {
+    if(confirm('Donner raison au plaignant et appliquer la pénalité ?')) showToast('⚖️ Décision rendue — Pénalité appliquée');
+  } else {
+    if(confirm('Rejeter ce litige ?')) showToast('⚖️ Litige rejeté — Parties notifiées');
+  }
+}
+
+// ══ MODALS ══
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+// ══ TOAST ══
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+</script>
+</body>
+</html>
